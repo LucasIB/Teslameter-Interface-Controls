@@ -1,0 +1,481 @@
+#!/usr/bin/python
+#-*- coding: utf-8 -*-
+"""
+Created on 23/10/2014
+Versão 1.0
+@author: Lucas Igor Balthazar
+"""
+#Importa bibliotecas
+import math
+import threading
+import numpy as np
+import sys
+import serial
+import time
+import traceback
+import matplotlib.pyplot as plt
+from PyQt4 import QtCore, QtGui
+
+from interface import *
+
+# Biblioteca de constantes utilizadas
+class constantes(object):
+    def __init__(self):
+        self.numero_de_abas = 3             # Número de abas da janela gráfica
+const = constantes()
+
+class My_MainWindow(QtGui.QMainWindow):
+    def __init__(self, parent=None):
+        #Inicializa a interface
+        QtGui.QWidget.__init__(self, parent)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.lock = threading.RLock()
+        self.default()
+        self.Fechar = True
+
+
+    def default(self):
+        for i in range(1,const.numero_de_abas):
+            self.ui.tabWidget.setTabEnabled(i,False)
+        # Comandos NMR
+        self.LerDisplay =   '\x05'          # Faz a leitura do valor no display. Formato: vdd.ddddddF/T
+        self.Status =       'S'             # Retorna o status atual do equipamento (1Byte)  
+        self.Aquisition =   'A'             # Modo Automático(1) ou Manual(0) de varredura da frequência
+        self.FieldSense =   'F'             # Positive(1) or Negative(0) Fields
+        self.Display =      'D'             # Seleciona o Display para MHz(0) ou Tesla(1)
+        self.Remoto =       'R'             # Acesso remoto (Desabilita o painel frontal)
+        self.Local =        'L'             # Acesso local (Habilita o painel frontal)
+        self.Coarse =       'C1400\r\n'     # Seleciona a Frequência (MHz)
+        self.Search =       'H'             # Habilita a 'busca automática de campo'
+        self.QuitSearch =   'Q'             # Desabilita o modo SEARCH
+        self.ResetTime =    'T'             # Reset NMR time-base
+        self.Timesearch =   'O'             # Velociade na pesquisa
+        self.Multiplex =    'X'             # Implica no número de multiplexadores
+        self.ReadDisplay =  'V'             # Velocidade de leitura do Display
+      
+        #Aba 1
+        self.ui.pb_Conectar.clicked.connect(self.Conectar)
+        self.ui.cb_portadriver.setCurrentIndex(5)
+        self.ui.cb_baudrate.setCurrentIndex(6)
+        self.ui.pb_Desconectar.clicked.connect(self.Desconectar)            
+        #Aba 2
+##        self.ui.pb_Atualizar_Camp.clicked.connect(self.Display_Campo)
+##        self.ui.pb_Atualizar_Freq.clicked.connect(self.Display_Freq)
+##        self.ui.dial.setValue(100) 
+##        self.ui.dial.sliderMoved.connect(self.AjusteFreq)
+        #Aba 2
+        self.ui.freq_sweep.setText(str(100))
+        self.ui.rb_Normal.setChecked(True)
+        self.ui.rb_sgl_probe.setChecked(True)
+        self.ui.cb_Channel_2.setCurrentIndex(3)
+        self.ui.cb_Channel_ini.setCurrentIndex(1)
+        self.ui.cb_Channel_fim.setCurrentIndex(6)
+        self.ui.cb_Aquisition.setCurrentIndex(1)
+        self.ui.cb_FieldSense.setCurrentIndex(0)
+        self.ui.cb_Display.setCurrentIndex(0)
+        self.ui.cb_Display_fast.setCurrentIndex(0)
+        self.ui.pb_configura.clicked.connect(self.Configurar)
+        
+    def Conectar(self):
+        try:
+            porta = self.ui.cb_portadriver.currentIndex()
+            self.serNMR = serial.Serial(porta)
+            expoente = self.ui.cb_baudrate.currentIndex()
+            self.serNMR.baudrate = 300*2**expoente      # Fórmula para calcular o Baud Rate com base no index
+            self.serNMR.bytesize = serial.EIGHTBITS
+            self.serNMR.stopbits = serial.STOPBITS_ONE
+            self.serNMR.parity = serial.PARITY_NONE
+            self.serNMR.timeout = .015
+            if not self.serNMR.isOpen():
+                self.serNMR.open()
+            if not self.Configurar():
+                raise Exception 
+            time.sleep(1)
+            self.Fechar = True
+            self.TimerInterface = threading.Thread(target=self.Varredura,args=())
+            self.TimerInterface.setDaemon(True)
+##            self.TimerInterface = threading.Thread(target=self.Varredura,args=(),daemon=True)
+            self.TimerInterface.start()
+            QtGui.QMessageBox.information(self,'Sucesso','Porta serial conectada.',QtGui.QMessageBox.Ok)
+            for i in range(1,const.numero_de_abas-1):
+                self.ui.tabWidget.setTabEnabled(i,True)       
+        except:
+            traceback.print_exc(file=sys.stdout)
+            QtGui.QMessageBox.critical(self,'Erro','Porta serial ocupada ou inexistente.',QtGui.QMessageBox.Ok)
+            return
+      
+    def Configurar(self):
+        #Configuração
+        try:
+            self.lock.acquire()
+            self.EscreverNMR(self.Remoto)   # Acesso remoto (Desabilita o painel frontal)
+            time.sleep(0.01)
+##            print(1)
+
+            if self.ui.rb_sgl_probe.isChecked() == True:
+                self.texto = self.ui.cb_Channel_2.currentText() # Seleciona o Canal do Multiplexador
+                self.EscreverNMR('P'+str(self.texto))
+                self.texto = self.ui.cb_Channel_2.currentText() # Seleciona o Canal do Multiplexador
+                self.EscreverNMR('P'+str(self.texto))                
+                self.EscreverNMR(self.Search+str(self.ui.freq_sweep.text())+'\r\n')
+##                print(2)
+                
+            if self.ui.rb_svr_probe.isChecked() == True:
+                inicial = self.ui.cb_Channel_ini.currentIndex()
+                final = self.ui.cb_Channel_fim.currentIndex()
+                self.diff = final - inicial
+                self.texto = self.ui.cb_Channel_ini.currentText() # Seleciona o Canal do Multiplexador
+                self.EscreverNMR('P'+str(self.texto))
+                self.EscreverNMR(self.Multiplex+str(self.diff+1))
+                self.EscreverNMR(self.Search+str(self.ui.freq_sweep.text())+'\r\n') #Inicia o SEARCH
+##                print(3)
+                
+            if self.ui.cb_Aquisition.currentIndex() == 0: # Manual
+                self.EscreverNMR(self.Aquisition+str(self.ui.cb_Aquisition.currentIndex()))
+                time.sleep(0.01)
+##                print(4)
+            else:
+                self.EscreverNMR(self.Aquisition+str(self.ui.cb_Aquisition.currentIndex()+1)) #Auto
+                time.sleep(0.01)
+##                print(5)
+
+            if self.ui.cb_FieldSense.currentIndex() == 0: # Negativo
+                self.EscreverNMR(self.FieldSense+str(self.ui.cb_FieldSense.currentIndex())) 
+                time.sleep(0.01)
+##                print(6)
+            else:
+                self.EscreverNMR(self.FieldSense+str(self.ui.cb_FieldSense.currentIndex()+1)) #Positivo
+                time.sleep(0.01)
+##                print(7)
+            
+            if self.ui.cb_Display.currentIndex() == 0: #MHz
+                self.EscreverNMR(self.Display+str(self.ui.cb_Display.currentIndex()))
+                time.sleep(0.01)
+##                print(8)
+            else:
+                self.EscreverNMR(self.Display+str(self.ui.cb_Display.currentIndex()+1)) #Tesla              
+                time.sleep(0.01)
+##                print(9)
+            if self.ui.cb_Display_fast.currentIndex() == 0: #OFF
+                self.EscreverNMR(self.ReadDisplay+str(self.ui.cb_Display_fast.currentIndex()))
+                time.sleep(0.01)
+##                print(10)
+            else:
+                self.EscreverNMR(self.ReadDisplay+str(self.ui.cb_Display_fast.currentIndex())) #ON            
+                time.sleep(0.01)
+##                print(11)
+
+            freq_init = int((self.ui.freq_sweep.text()))
+            self.EscreverNMR('C'+str(freq_init)+'\r\n')
+            if self.ui.rb_High.isChecked():
+                self.EscreverNMR(self.Timesearch+'1')   #9 segundos para completar a busca na sonda
+##                print('Alta')
+            elif self.ui.rb_Normal.isChecked():
+                self.EscreverNMR(self.Timesearch+'4')   #18 segundos para completar a busca na sonda
+##                print('Normal')
+            elif self.ui.rb_Low.isChecked():
+                self.EscreverNMR(self.Timesearch+'6')   #24 segundos para completar a busca na sonda
+##                print('Low')
+            self.lock.release()
+            return True
+        except:
+            traceback.print_exc(file=sys.stdout)
+            self.lock.release()
+            QtGui.QMessageBox.critical(self,'Erro','Falha na configuração.',QtGui.QMessageBox.Ok)
+            return False
+
+    def EscreverNMR(self, Comando):
+        self.serNMR.write(Comando.encode('utf-8'))
+
+    def LerNMR(self, Comando):
+        self.serNMR.write(Comando.encode('utf-8'))
+        return self.serNMR.read(20).decode('utf-8')
+
+    def TrataDados(self):
+        pass
+
+##    ABA: TESTE
+    def Display_Freq(self):
+        try:
+            self.LerNMR('D0')
+            Disp = self.LerNMR(self.LerDisplay)
+            Disp1 = Disp[1:-3]
+            Disp2 = round(float(Disp1),3)
+            self.ui.lcd_Freq.display(Disp2)
+        except:
+            QtGui.QMessageBox.critical(self,'Erro','Falha na Leitura.',QtGui.QMessageBox.Ok)
+            return
+
+    def Display_Campo(self):
+        if self.ui.cb_Display.currentIndex() == 1: 
+            try:
+                self.LerNMR('D1')
+                Disp = self.LerNMR(self.LerDisplay)
+                Disp1 = Disp[1:-3]
+                Disp2 = round(float(Disp1),3)
+                self.ui.lcd_Campo.display(Disp2)
+            except:
+                QtGui.QMessageBox.critical(self,'Erro','Falha na Leitura.',QtGui.QMessageBox.Ok)
+                return
+        else:      
+            QtGui.QMessageBox.warning(self,'Atenção','Opção inválida.',QtGui.QMessageBox.Ok)
+            return
+
+##    def AjusteFreq(self):
+##        if self.ui.freq_inical.text() == '':
+##            QtGui.QMessageBox.critical(self,'Erro','Insira uma fequência inicial.',QtGui.QMessageBox.Ok)
+##            return                
+##        try:
+##            self.lock.acquire()
+##            valor = self.ui.dial.value()
+##            freq = freq + int(valor)
+##            self.EscreverNMR('C'+str(freq)+'\r\n')
+##            self.ui.lineEdit_freq.setText(str(freq))
+##            self.lock.release()
+##        except:
+##            QtGui.QMessageBox.warning(self,'Atenção','Ajuste a frequência para um valor válido.',QtGui.QMessageBox.Ok)
+##            return
+
+##    ABA: AQUISIÇÃO        
+    def Varredura(self):
+        try:
+            while(self.Fechar):
+                self.lock.acquire()
+                self.Status1()
+                self.lock.release()
+##            print ('Fim Threading')
+        except:
+            traceback.print_exc(file=sys.stdout)
+            self.lock.release()
+            QtGui.QMessageBox.critical(self,'Erro','Falha na aquisição.',QtGui.QMessageBox.Ok)
+            return
+        
+    def Status1(self):
+        # Status S1:
+        time.sleep(0.2)
+        num = self.LerNMR(self.Status+'1')
+        num1 = num[1:-2]
+        if num1 == '':
+            num1 = 0
+        num2 = int((str('0x')+str(num1)), 16)
+##        print('Status1:',num2)
+        comp = (num2 & 1)         # Bit 0
+        if comp == 1:
+            self.DataReady()    
+        comp = (num2 >> 1) & 1    # Bit 1
+        if comp == 1:
+            self.NMRSignalSeen()
+##        comp = (num2 >> 2) & 1  # Bit 2
+##        if comp == 1:
+##            self.Syntaxerror()  
+##        comp = (num2 >> 3) & 1  # Bit 3
+##        if comp == 1:
+##            w = LerNMR('S3')
+##            print(w)
+##            self.Harderror()    
+        comp = (num2 >> 4) & 1    # Bit 4
+        if comp == 1:
+            self.LocalPushButton()
+        comp = (num2 >> 5) & 1    # Bit 5
+        if comp == 1:
+            self.NMRLock()
+            QtGui.QMessageBox.information(self,'Sucesso','Sinal encontrado. Lock efetuado com sucesso',QtGui.QMessageBox.Ok)
+        else:
+            self.ui.NMR_lock_gree.setVisible(False)
+            self.ui.NMR_lock_tran.setVisible(True)
+
+##        comp = (num2 >> 6) & 1    # Bit 6
+##        if comp == 1:
+##            self.ui.power.setText('ON')
+##        else:
+##            self.ui.power.setText('OFF')
+        self.Status2()
+
+    def Status2(self):
+        time.sleep(0.2)
+        num = self.LerNMR(self.Status+'2')
+        num1 = num[1:-2]
+        if num1 == '':
+            num1 = 0
+        num2 = int((str('0x')+str(num1)), 16)
+##        print('Status2:',num2)
+        comp = (num2 & 1)         # Bit 0
+        if comp == 1:
+            self.TOOLO()        
+        comp = (num2 >> 1) & 1    # Bit 1
+        if comp == 1:
+            self.TOOHI()        
+        comp = (num2 >> 2) & 1    # Bit 2
+        if comp == 1:
+            self.ui.Signal_State.setText(str('OK')) 
+        else:
+            self.ui.Signal_State.setText(str('OFF'))
+        comp = (num2 >> 3) & 1    # Bit 3
+        if comp == 1:
+            self.NMRSignalSeen()
+        self.Status3()
+
+    def Status3(self):
+        time.sleep(0.2)
+        #### Status S3: (Byte1) ####
+        num = self.LerNMR(self.Status+'3')
+        num1 = num[1:-2]
+        if num1 == '':
+            num1 = 0
+        num2 = int((str('0x')+str(num1)), 16)
+##        print(num1)
+##        print('Status3:',num2)
+        comp = (num2 & 1)         # Bit 0
+        if comp == 1:
+            Disp = self.LerNMR(self.LerDisplay)
+            Disp1 = Disp[1:-3]
+            Disp2 = round(float(Disp1),5)
+            self.ui.lcd_Campo_2.display(Disp2)
+        else:
+            Disp = self.LerNMR(self.LerDisplay)
+            Disp1 = Disp[1:-3]
+            print(Disp1)
+            Disp2 = round(float(Disp1),5)
+            self.ui.lcd_Freq_2.display(Disp2)
+        comp = (num2 >> 1) & 1    # Bit 1
+        if comp == 1:
+            self.ui.auto_manu.setText('Auto')
+        else:
+            self.ui.auto_manu.setText('Manual')
+        comp = (num2 >> 2) & 1    # Bit 2
+        if comp == 1:
+            self.ui.Posit_Negat.setText('Positivo')
+        else:
+            self.ui.Posit_Negat.setText('Negativo')
+        comp = (num2 >> 3) & 1    # Bit 3
+        if comp == 1:
+            self.ui.searchmd.setText('ON')
+        else:
+            self.ui.searchmd.setText('OFF')
+        comp = (num2 >> 4) & 1    # Bit 4
+        quatro = comp
+        comp = (num2 >> 5) & 1    # Bit 5
+        cinco = comp
+        comp = (num2 >> 6) & 1    # Bit 6
+        seis = comp
+        soma = str(seis)+str(cinco)+str(quatro)
+        integral = int(soma)
+##        print(integral)
+        if integral == 0:
+            self.ui.multiplex.setText('Canal A')
+        elif integral == 1:
+            self.ui.multiplex.setText('Canal B')
+        elif integral == 10:
+            self.ui.multiplex.setText('Canal C')
+        elif integral == 11:
+            self.ui.multiplex.setText('Canal D')
+        elif integral == 100:
+            self.ui.multiplex.setText('Canal E')
+        elif integral == 101:
+            self.ui.multiplex.setText('Canal F')
+        elif integral == 110:
+            self.ui.multiplex.setText('Canal G')
+        elif integral == 111:
+            self.ui.multiplex.setText('Canal H')
+        comp = (num2 >> 7) & 1    # Bit 7
+        if comp == 1:
+            self.ui.fastRead.setText('ON')
+        else:
+            self.ui.fastRead.setText('OFF')
+
+    def NMRLock(self):
+        self.ui.NMR_lock_gree.setVisible(True)
+        self.ui.NMR_lock_tran.setVisible(False)
+        
+    def TOOLO(self):
+        self.ui.tooloGreen.setVisible(True)
+        self.ui.tooloRed.setVisible(False)
+        self.ui.toohiRed.setVisible(True)
+        self.ui.toohiGreen.setVisible(False)
+
+    def TOOHI(self):
+        self.ui.toohiGreen.setVisible(True)
+        self.ui.toohiRed.setVisible(False)
+        self.ui.tooloRed.setVisible(True)
+        self.ui.tooloGreen.setVisible(False)
+    
+    def DataReady(self):
+        time.sleep(0.2)
+        self.ui.dataready.setText(str('Concluído'))
+    
+    def NMRSignalSeen(self):
+        try:
+            self.ui.signalseen.setText(str('OK'))
+        except:
+            QtGui.QMessageBox.information(self,'Sinal','O NMR detectou a presença de sinal.',QtGui.QMessageBox.Ok)
+            return
+
+    def Syntaxerror(self):
+        QtGui.QMessageBox.critical(self,'Erro','Erro de sintaxe.',QtGui.QMessageBox.Ok)
+        return
+
+    def Harderror(self):
+        QtGui.QMessageBox.critical(self,'Erro','Não foi possível realizar a leitura do display corrretamente.',QtGui.QMessageBox.Ok)
+        return
+
+    def LocalPushButton(self):
+        QtGui.QMessageBox.warning(self,'Aviso','Botão LOCAL pressionado',QtGui.QMessageBox.Ok)
+        return
+    
+    def Desconectar(self):
+        try:
+            self.EscreverNMR(self.QuitSearch)
+            time.sleep(0.5)
+            self.EscreverNMR(self.Local)
+            time.sleep(0.05)
+            self.Fechar = False
+            while( self.TimerInterface.isAlive()):
+                pass
+##            time.sleep(3)       # Tem que 3 segundos para aguardar o final da Threading
+            self.serNMR.close()
+            for i in range(1,const.numero_de_abas):
+                self.ui.tabWidget.setTabEnabled(i,False)
+        except:
+            QtGui.QMessageBox.critical(self,'Erro','Porta serial ocupada ou inexistente. Falha ao desconectar.',QtGui.QMessageBox.Ok)
+            return 
+
+    def LerCampoNMR():
+        c = LerNMR(LerCampo)
+        c = a[0:-3]
+        return c    
+
+############################################################        
+class interface(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.start()
+
+    def run(self):
+        # Inicia Interface Gráfica
+        self.App = QtGui.QApplication(sys.argv)
+        self.myapp = My_MainWindow()
+        self.myapp.show()
+##        print('Fechou janela 1')
+        self.App.exec_()
+##        print('Fechou janela 2')
+        self.myapp.Fechar = False
+        time.sleep(3)
+        if self.myapp.serNMR.isOpen():
+            self.myapp.serNMR.close()
+
+
+##class interface(object):
+##    def __init__(self):
+##        # Inicia Interface Grafica
+##        self.App = QtGui.QApplication(sys.argv)
+##        self.myapp = My_MainWindow()
+##        self.myapp.show()
+##        self.App.exec_()
+##        self.Fechar = False
+
+a = interface()
+
+
+
+        
