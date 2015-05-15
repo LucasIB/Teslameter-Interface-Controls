@@ -20,7 +20,7 @@ from interface import *
 # Biblioteca de constantes utilizadas
 class constantes(object):
     def __init__(self):
-        self.numero_de_abas = 6             # Número de abas da janela gráfica
+        self.numero_de_abas = 3             # Número de abas da janela gráfica
 const = constantes()
 
 class My_MainWindow(QtGui.QMainWindow):
@@ -29,9 +29,9 @@ class My_MainWindow(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.sinais()
-
         self.lock = threading.RLock()
+        self.default()
+        self.Fechar = True
 
     def sinais(self):
         for i in range(1,const.numero_de_abas):
