@@ -1,0 +1,27 @@
+#!/usr/bin/python
+#-*- coding: utf-8 -*-
+"""
+Created on 23/10/2014
+Versão 1.0
+@author: Lucas Balthazar
+"""
+#Importa bibliotecas
+import math
+import threading
+import numpy as np
+import sys
+import serial
+import time
+import matplotlib.pyplot as plt
+from PyQt4 import QtCore, QtGui
+
+
+class MyForm(QtGui.QMainWindow):
+    def __init__(self, parent=None):
+        #Inicializa a interface
+        QtGui.QWidget.__init__(self, parent)
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+        #Botões
+        self.ui..pb

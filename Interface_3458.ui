@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>802</width>
+    <height>612</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="CNPEM_logo">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>0</y>
+      <width>181</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../../../Imagens/logoCNPEM2.qrc.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="LNLS_logo">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>181</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../../bobinona/imagens/lnls sirius logo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QMdiArea" name="mdiArea">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>0</y>
+      <width>441</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="background">
+     <brush brushstyle="SolidPattern">
+      <color alpha="255">
+       <red>255</red>
+       <green>255</green>
+       <blue>255</blue>
+      </color>
+     </brush>
+    </property>
+   </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>100</y>
+      <width>811</width>
+      <height>381</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Leitura</string>
+     </attribute>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>30</y>
+        <width>141</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Número de dígitos:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="NumDig">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>60</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>14</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>1.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>3.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>3.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>5.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>5.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>6.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>6.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>7.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>7.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8.0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8.5</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>100</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Escala DC:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="EscalaDC">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>130</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>100 mV</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1 V</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10 V</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>100 V</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1000 V</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>210</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>ms</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>210</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>180</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Abertura:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>210</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Timer:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>180</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>180</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>ms</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>260</y>
+        <width>101</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Ok</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>10</y>
+        <width>20</width>
+        <height>321</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>20</y>
+        <width>341</width>
+        <height>311</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../Imagens/gráfico.jpg</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>490</y>
+      <width>781</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="page"/>
+    <widget class="QWidget" name="page_2"/>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>802</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="defaultUp">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="menuConexao">
+    <property name="title">
+     <string>Conexão</string>
+    </property>
+    <widget class="QMenu" name="menuAddress">
+     <property name="title">
+      <string>Address</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../../../bobinona/imagens/cable.png</normaloff>../../../bobinona/imagens/cable.png</iconset>
+     </property>
+     <addaction name="Addr20"/>
+     <addaction name="Addr21"/>
+     <addaction name="Addr22"/>
+     <addaction name="Addr23"/>
+     <addaction name="Addr24"/>
+     <addaction name="Addr25"/>
+    </widget>
+    <widget class="QMenu" name="menuPort">
+     <property name="title">
+      <string>Port</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../../../bobinona/imagens/connect.png</normaloff>../../../bobinona/imagens/connect.png</iconset>
+     </property>
+     <addaction name="Port1"/>
+     <addaction name="Port2"/>
+     <addaction name="Port3"/>
+     <addaction name="Port4"/>
+     <addaction name="Port5"/>
+     <addaction name="Port6"/>
+     <addaction name="Port7"/>
+     <addaction name="Port8"/>
+     <addaction name="Port9"/>
+    </widget>
+    <widget class="QMenu" name="menuBaud_Rate">
+     <property name="title">
+      <string>Baud Rate</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../../../bobinona/imagens/connection.png</normaloff>../../../bobinona/imagens/connection.png</iconset>
+     </property>
+     <addaction name="action300"/>
+     <addaction name="action600"/>
+     <addaction name="action1200"/>
+     <addaction name="action2400"/>
+     <addaction name="action4800"/>
+     <addaction name="action9600"/>
+     <addaction name="action19200"/>
+    </widget>
+    <addaction name="menuAddress"/>
+    <addaction name="menuPort"/>
+    <addaction name="menuBaud_Rate"/>
+    <addaction name="actionConectar"/>
+    <addaction name="actionDesconectar"/>
+   </widget>
+   <widget class="QMenu" name="menuConfigurar">
+    <property name="title">
+     <string>Configurar</string>
+    </property>
+    <widget class="QMenu" name="menuAbertura">
+     <property name="title">
+      <string>Abertura</string>
+     </property>
+     <addaction name="action500_ns_Default_2"/>
+     <addaction name="action166_ms_2"/>
+     <addaction name="action200_ms"/>
+    </widget>
+    <widget class="QMenu" name="menuTimer">
+     <property name="title">
+      <string>Timer</string>
+     </property>
+     <addaction name="action1_segundo"/>
+     <addaction name="action2_segundos"/>
+     <addaction name="action3_segundos"/>
+     <addaction name="action4_segundos"/>
+    </widget>
+    <addaction name="menuAbertura"/>
+    <addaction name="menuTimer"/>
+    <addaction name="actionConfigura"/>
+   </widget>
+   <addaction name="menuConexao"/>
+   <addaction name="menuConfigurar"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionConectar">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../bobinona/imagens/1351621501_Check.png</normaloff>../../../bobinona/imagens/1351621501_Check.png</iconset>
+   </property>
+   <property name="text">
+    <string>Conectar</string>
+   </property>
+  </action>
+  <action name="actionDesconectar">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../bobinona/imagens/1351619288_DeleteRed.png</normaloff>../../../bobinona/imagens/1351619288_DeleteRed.png</iconset>
+   </property>
+   <property name="text">
+    <string>Desconectar</string>
+   </property>
+  </action>
+  <action name="Addr20">
+   <property name="text">
+    <string>20</string>
+   </property>
+  </action>
+  <action name="Addr21">
+   <property name="text">
+    <string>21</string>
+   </property>
+  </action>
+  <action name="Addr22">
+   <property name="text">
+    <string>22</string>
+   </property>
+  </action>
+  <action name="Addr23">
+   <property name="text">
+    <string>23</string>
+   </property>
+  </action>
+  <action name="Addr24">
+   <property name="text">
+    <string>24</string>
+   </property>
+  </action>
+  <action name="Port1">
+   <property name="text">
+    <string>COM1</string>
+   </property>
+  </action>
+  <action name="Port2">
+   <property name="text">
+    <string>COM2</string>
+   </property>
+  </action>
+  <action name="Port3">
+   <property name="text">
+    <string>COM3</string>
+   </property>
+  </action>
+  <action name="Port4">
+   <property name="text">
+    <string>COM4</string>
+   </property>
+  </action>
+  <action name="Port5">
+   <property name="text">
+    <string>COM5</string>
+   </property>
+  </action>
+  <action name="Port6">
+   <property name="text">
+    <string>COM6</string>
+   </property>
+  </action>
+  <action name="Port7">
+   <property name="text">
+    <string>COM7</string>
+   </property>
+  </action>
+  <action name="Port8">
+   <property name="text">
+    <string>COM8</string>
+   </property>
+  </action>
+  <action name="Port9">
+   <property name="text">
+    <string>COM9</string>
+   </property>
+  </action>
+  <action name="action300">
+   <property name="text">
+    <string>300 bps</string>
+   </property>
+  </action>
+  <action name="action600">
+   <property name="text">
+    <string>600 bps</string>
+   </property>
+  </action>
+  <action name="action1200">
+   <property name="text">
+    <string>1200 bps</string>
+   </property>
+  </action>
+  <action name="action4800">
+   <property name="text">
+    <string>4800 bs</string>
+   </property>
+  </action>
+  <action name="action9600">
+   <property name="text">
+    <string>9600 bps</string>
+   </property>
+  </action>
+  <action name="action19200">
+   <property name="text">
+    <string>19200 bps</string>
+   </property>
+  </action>
+  <action name="action2400">
+   <property name="text">
+    <string>2400 bps</string>
+   </property>
+  </action>
+  <action name="Addr25">
+   <property name="text">
+    <string>25</string>
+   </property>
+  </action>
+  <action name="action166_ms">
+   <property name="text">
+    <string>166 ms (60 Hz)</string>
+   </property>
+  </action>
+  <action name="action500_ns">
+   <property name="text">
+    <string>200 ms (50 ~ 400 Hz)</string>
+   </property>
+  </action>
+  <action name="action500_ns_Default">
+   <property name="text">
+    <string>500 ns (Default)</string>
+   </property>
+  </action>
+  <action name="action500_ns_Default_2">
+   <property name="text">
+    <string>500 ns (Default)</string>
+   </property>
+  </action>
+  <action name="action166_ms_2">
+   <property name="text">
+    <string>166 ms (60 Hz)</string>
+   </property>
+  </action>
+  <action name="action200_ms">
+   <property name="text">
+    <string>200 ms (50 ~ 400 Hz)</string>
+   </property>
+  </action>
+  <action name="actionConfigura">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../bobinona/imagens/configure.png</normaloff>../../../bobinona/imagens/configure.png</iconset>
+   </property>
+   <property name="text">
+    <string>Configura</string>
+   </property>
+  </action>
+  <action name="action1_segundo">
+   <property name="text">
+    <string>1 segundo</string>
+   </property>
+  </action>
+  <action name="action2_segundos">
+   <property name="text">
+    <string>2 segundos</string>
+   </property>
+  </action>
+  <action name="action3_segundos">
+   <property name="text">
+    <string>3 segundos</string>
+   </property>
+  </action>
+  <action name="action4_segundos">
+   <property name="text">
+    <string>4 segundos</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

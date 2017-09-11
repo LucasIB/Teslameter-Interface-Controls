@@ -1,0 +1,144 @@
+ ConfiguraNMR()
+>>> EscreverNMR('C2000\r\n')
+>>> EscreverNMR('C5000\r\n')
+>>> LerNMR(Display)
+''
+>>> LerNMR('D0')
+''
+>>> LerNMR(Canal)
+''
+>>> LerNMR(LerCampo)
+'N44.914011F\r\n'
+>>> LerNMR(Status)
+'S03\r\n'
+>>> LerNMR('D0')
+''
+>>> LerNMR('D1')
+''
+>>> LerNMR(LerCampo)
+'N1.0536470T\r\n'
+>>> bin(03)
+SyntaxError: invalid token
+>>> bin(3)
+'0b11'
+>>> LerNMR(LerCampo)
+'N1.0549504T\r\n'
+>>> EscreverNMR('D0')
+>>> LerNMR(LerCampo)
+'N44.862282F\r\n'
+>>> EscreverNMR('C2000\r\n')
+>>> LerNMR(LerCampo)
+'N25.598925F\r\n'
+>>> EscreverNMR('C2020\r\n')
+>>> EscreverNMR('C1500\r\n')
+>>> EscreverNMR('D1')
+>>> LerNMR(LerCampo)
+'N0.5132966T\r\n'
+>>> EscreverNMR(Local)
+>>> a=ABCDEF
+Traceback (most recent call last):
+  File "<pyshell#24>", line 1, in <module>
+    a=ABCDEF
+NameError: name 'ABCDEF' is not defined
+>>> a=str('ABCDEF')
+>>> b=a[1:3]
+>>> print(b)
+BC
+>>> b=a[:3]
+>>> print(b)
+ABC
+>>> c=str('vdd.ddddddF\r\n')
+>>> b=c[1:9]
+>>> print(b)
+dd.ddddd
+>>> c=str('vdd.dddddddF\r\n')
+>>> b=c[1:10]
+>>> print(b)
+dd.dddddd
+>>> b=c[1:11]
+>>> print(b)
+dd.ddddddd
+>>> round(4.5)
+4
+>>> round(4.985)
+5
+>>> d=45,1234567
+>>> d=45.1234567
+>>> f=round(d,3)
+>>> print(f)
+45.123
+>>> =======================================================================
+Disp=a.myapp.LerNMR('\x05')
+>>> print(Disp)
+N21.583197F
+
+>>> Disp1 = round(float(Disp[1:11]),3)
+Traceback (most recent call last):
+  File "<pyshell#3>", line 1, in <module>
+    Disp1 = round(float(Disp[1:11]),3)
+ValueError: could not convert string to float: '21.583197F'
+>>> Disp1 = Disp[1:11]
+>>> print(Disp1)
+21.583197F
+>>> Disp1 = Disp[1:-3]
+>>> print(Disp1)
+21.583197
+>>> Disp2 = round(Disp1,3)
+Traceback (most recent call last):
+  File "<pyshell#8>", line 1, in <module>
+    Disp2 = round(Disp1,3)
+TypeError: type str doesn't define __round__ method
+>>> Disp2 = round(float(Disp1),3)
+>>> print(Disp2)
+21.583
+>>> 
+============================================================================
+##        maximo = int(self.ui.freq_inical.text())
+##        self.ui.dial.setMaximum(int(maximo))
+##        minimo = int(self.ui.freq_final.text())
+##        self.ui.dial.setMinimum(int(minimo))
+##        freq = 1200
+============================================================================
+
+def AjusteFreq (self):         
+        if not self.ui.lineEdit_freq.setDisabled(False):
+            QtGui.QMessageBox.warning(self,'Atenção.','Coloque a frequência inicial, a frequência final e clique em Ok.',QtGui.QMessageBox.Ok)
+            return
+        else:
+            try:
+                freq = int(self.ui.freq_inicial.text())
+                self.ui.dial.setMaximum(freq)           # Valor máximo do Dial
+                minimo = int(self.ui.freq_final.text()) # Valor mínimo do Dial
+                self.ui.dial.setMinimum(minimo)    
+                if self.ui.ok.clicked.connect():
+##                    return self.dial()
+                    freq = int(self.ui.freq_inicial.text())
+                    self.ui.lineEdit_freq.setDisabled(False)
+                    valor = self.ui.dial.value()
+                    freq = freq + int(valor)
+                    self.EscreverNMR('C'+str(freq)+'\r\n')
+                    self.ui.lineEdit_freq.setText(str(freq))
+            except:
+                QtGui.QMessageBox.warning(self,'Atenção.','Ajuste a frequência para um valor válido.',QtGui.QMessageBox.Ok)
+                return
+
+==============================================================================
+#########COMPARA_BITS#############
+binPoints = bin(num2)
+        t = len(binPoints)                
+        if t <= 10:
+            x = str(binPoints[2:])
+            z = x.zfill(8)
+            play = int(z)
+            print(play)
+        # Comparação bit a bit:
+        if num2 == 0:
+            outnow = num2 & 0x1
+            outnew = outnow  # MHz
+        else num2 == 1:
+            outnow = num2 | 0x1
+            outnew = outnow  # Tesla
+
+        if num2 == 3:
+            outnow = num2 & 0x2
+            outnow = num2 
